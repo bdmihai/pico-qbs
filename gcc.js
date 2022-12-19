@@ -270,14 +270,10 @@ function prepareBootLinker(project, product, inputs, outputs, input, output, exp
         var data = infile.read(252);
         infile.close();
 
-        /* patch the CRC */
-        var crc = Checksum.crc32(data);
-        data.push(crc[0], crc[1], crc[2], crc[3]);
-        
         /* write back to the file */
-        var outfile = BinaryFile(output, BinaryFile.WriteOnly);
-        outfile.resize(0);
-        outfile.write(data);
+        var outfile = BinaryFile(output, BinaryFile.ReadWrite);
+        outfile.seek(252);
+        outfile.write(Checksum.crc32(data));
         outfile.close();
     };
     cmd.jobPool = 'linker';

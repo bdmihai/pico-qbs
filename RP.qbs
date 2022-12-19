@@ -117,7 +117,6 @@ Module {
         '-specs=nano.specs',
         '-masm-syntax-unified',
         '-ffreestanding',
-        '-fno-exceptions',
         '-ffunction-sections',
         '-fdata-sections',
         '-fstack-usage',

@@ -81,8 +81,8 @@ Module {
         //'-ffreestanding',
         //'-fno-exceptions',
         //'-fno-unwind-tables',
-        //'-ffunction-sections',
-        //'-fdata-sections',
+        '-ffunction-sections',
+        '-fdata-sections',
         //'-fstack-usage',
         //'-Wall',
         //'-Wextra',
@@ -94,15 +94,15 @@ Module {
 
     property stringList cFlags: [
         '-std=gnu11',
-        '-specs=nosys.specs',
-        '-specs=nano.specs',
+        //'-specs=nosys.specs',
+        //'-specs=nano.specs',
         '-masm-syntax-unified',
-        '-ffreestanding',
-        '-fno-exceptions',
-        '-fno-unwind-tables',
+        //'-ffreestanding',
+        //'-fno-exceptions',
+        //'-fno-unwind-tables',
         '-ffunction-sections',
         '-fdata-sections',
-        '-fstack-usage',
+        //'-fstack-usage',
         '-Wall',
         '-Wextra',
         '-Og',
@@ -113,17 +113,18 @@ Module {
 
     property stringList cxxFlags: [
         '-std=gnu++17',
-        '-specs=nosys.specs',
-        '-specs=nano.specs',
+        //'-specs=nosys.specs',
+        //'-specs=nano.specs',
         '-masm-syntax-unified',
-        '-ffreestanding',
+        //'-ffreestanding',
         '-ffunction-sections',
         '-fdata-sections',
-        '-fstack-usage',
+        //'-fstack-usage',
         '-fno-unwind-tables',
         '-fno-exceptions',
         '-fno-rtti',
         '-fno-threadsafe-statics',
+        '-fno-use-cxa-atexit',
         '-Wall',
         '-Wextra',
         '-Og',
@@ -142,19 +143,20 @@ Module {
     property stringList linkerFlags: [
         //'-specs=nosys.specs',
         //'-specs=nano.specs',
+        '--specs=nosys.specs',
         //'-masm-syntax-unified',
         //'-nostartfiles',
-        //'-ffreestanding',
-        //'-fno-exceptions',
-        //'-fno-unwind-tables',
-        //'-ffunction-sections',
-        //'-fdata-sections',
-        //'-fstack-usage',
-        //'-Wall',
-        //'-Wextra',
-        //'-Wl,--no-warn-rwx-segments', // disable the warning about rwx segments 
-        '-nostartfiles',
-        '-nodefaultlibs',
+        '-ffreestanding',
+        '-fno-exceptions',
+        '-fno-unwind-tables',
+        '-ffunction-sections',
+        '-fdata-sections',
+        '-fstack-usage',
+        '-Wall',
+        '-Wextra',
+        '-Wl,--no-warn-rwx-segments', // disable the warning about rwx segments 
+        //'-nostartfiles',
+        //'-nodefaultlibs',
         '-nolibc',
         '-Og',
         '-ggdb'
@@ -264,16 +266,12 @@ Module {
         multiplex: true
         inputs: ['lib', 'linkerscript']
         inputsFromDependencies: ['lib', 'linkerscript']
-        outputFileTags: ['bootloader', 'app', 'map', 'bin']
+        outputFileTags: ['app', 'map', 'bin']
         outputArtifacts: {
             var artifacts = [
                 {
                     filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.elf'),
                     fileTags: ['app']
-                },
-                {
-                    filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.elf'),
-                    fileTags: ['bootloader']
                 },
                 {
                     filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.map'),
@@ -289,35 +287,6 @@ Module {
 
         prepare: {
             return Gcc.prepareAppLinker.apply(Gcc, arguments);
-        }
-    }
-
-    Rule {
-        name: 'bootlinker'
-        multiplex: true
-        inputs: ['lib', 'linkerscript']
-        inputsFromDependencies: ['lib', 'linkerscript']
-        outputFileTags: ['boot', 'map', 'bin']
-        outputArtifacts: {
-            var artifacts = [
-                {
-                    filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.elf'),
-                    fileTags: ['boot']
-                },
-                {
-                    filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.map'),
-                    fileTags: ['map']
-                },
-                {
-                    filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.bin'),
-                    fileTags: ['bin']
-                }
-            ];
-            return artifacts;
-        }
-
-        prepare: {
-            return Gcc.prepareBootLinker.apply(Gcc, arguments);
         }
     }
 
@@ -343,9 +312,9 @@ Module {
         }
         searchPaths: {
             var retval = [];
-            for (var i = 0; i < (product.pico.libraryPaths || []).length; i++) {
-                retval.push(product.pico.libraryPaths[i]);
-                console.debug('linkerscript include added ' + product.pico.libraryPaths[i]);
+            for (var i = 0; i < (product.rp.libraryPaths || []).length; i++) {
+                retval.push(product.rp.libraryPaths[i]);
+                console.debug('linkerscript include added ' + product.rp.libraryPaths[i]);
             }
             var regexp = /[\s]*SEARCH_DIR[\s]*\((\S+)\).*/ // 'SEARCH_DIR(path)'
             var match;

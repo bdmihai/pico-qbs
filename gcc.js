@@ -21,7 +21,7 @@
  | THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                 |
  |____________________________________________________________________________|
  |                                                                            |
- |  Author: Mihai Baneu                           Last modified: 16.Dec.2022  |
+ |  Author: Mihai Baneu                           Last modified: 20.Dec.2022  |
  |                                                                            |
  |___________________________________________________________________________*/
 
@@ -31,28 +31,29 @@ var Checksum   = require('crc32.js');
 
 function prepareAssembler(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
-    flags = flags.uniqueConcat(product.pico.asmFlags);
-    flags = flags.uniqueConcat(product.pico.seriesAsmFlags);
-    flags = flags.uniqueConcat(product.pico.targetAsmFlags);
+    flags = flags.uniqueConcat(product.rp.asmFlags);
+    flags = flags.uniqueConcat(product.rp.seriesAsmFlags);
+    flags = flags.uniqueConcat(product.rp.targetAsmFlags);
 
     var defines = [];
-    defines = defines.uniqueConcat(product.pico.defines);
-    defines = defines.uniqueConcat(product.pico.seriesDefines);
-    defines = defines.uniqueConcat(product.pico.targetDefines);
+    defines = defines.uniqueConcat(product.rp.defines);
+    defines = defines.uniqueConcat(product.rp.seriesDefines);
+    defines = defines.uniqueConcat(product.rp.targetDefines);
 
     var includePaths = [];
-    includePaths = includePaths.uniqueConcat(product.pico.includePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.seriesIncludePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.targetIncludePaths);
-
+    
+    includePaths = includePaths.uniqueConcat(product.rp.includePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.seriesIncludePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.targetIncludePaths);
+    console.info(includePaths);
     var args = flags;
+    args.push('-x', 'assembler-with-cpp');
     args = args.concat(defines.map(function(define) { return '-D' + define }));
     includePaths.forEach(function(path) { args.push('-I', path); });
-    args.push('-x', 'assembler-with-cpp');
     args.push('-c', input.filePath);
     args.push('-o', output.filePath);
 
-    var cmd = new Command(product.pico.assemblerPath, args);
+    var cmd = new Command(product.rp.assemblerPath, args);
     cmd.workingDirectory = product.sourceDirectory;
     cmd.description = 'assembling ' + input.fileName;
     cmd.highlight = 'compiler';
@@ -63,19 +64,19 @@ function prepareAssembler(project, product, inputs, outputs, input, output, expl
 
 function prepareCompiler(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
-    flags = flags.uniqueConcat(product.pico.cFlags);
-    flags = flags.uniqueConcat(product.pico.seriesCFlags);
-    flags = flags.uniqueConcat(product.pico.targetCFlags);
+    flags = flags.uniqueConcat(product.rp.cFlags);
+    flags = flags.uniqueConcat(product.rp.seriesCFlags);
+    flags = flags.uniqueConcat(product.rp.targetCFlags);
 
     var defines = [];
-    defines = defines.uniqueConcat(product.pico.defines);
-    defines = defines.uniqueConcat(product.pico.seriesDefines);
-    defines = defines.uniqueConcat(product.pico.targetDefines);
+    defines = defines.uniqueConcat(product.rp.defines);
+    defines = defines.uniqueConcat(product.rp.seriesDefines);
+    defines = defines.uniqueConcat(product.rp.targetDefines);
 
     var includePaths = [];
-    includePaths = includePaths.uniqueConcat(product.pico.includePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.seriesIncludePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.targetIncludePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.includePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.seriesIncludePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.targetIncludePaths);
 
     var args = flags;
     args = args.concat(defines.map(function(define) { return '-D' + define }));
@@ -83,7 +84,7 @@ function prepareCompiler(project, product, inputs, outputs, input, output, expli
     args.push('-c', input.filePath);
     args.push('-o', output.filePath);
 
-    var cmd = new Command(product.pico.compilerPath, args);
+    var cmd = new Command(product.rp.compilerPath, args);
     cmd.workingDirectory = product.sourceDirectory;
     cmd.description = 'compiling ' + input.fileName;
     cmd.highlight = 'compiler';
@@ -93,19 +94,19 @@ function prepareCompiler(project, product, inputs, outputs, input, output, expli
 
 function prepareCxxCompiler(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
-    flags = flags.uniqueConcat(product.pico.cxxFlags);
-    flags = flags.uniqueConcat(product.pico.seriesCxxFlags);
-    flags = flags.uniqueConcat(product.pico.targetCxxFlags);
+    flags = flags.uniqueConcat(product.rp.cxxFlags);
+    flags = flags.uniqueConcat(product.rp.seriesCxxFlags);
+    flags = flags.uniqueConcat(product.rp.targetCxxFlags);
 
     var defines = [];
-    defines = defines.uniqueConcat(product.pico.defines);
-    defines = defines.uniqueConcat(product.pico.seriesDefines);
-    defines = defines.uniqueConcat(product.pico.targetDefines);
+    defines = defines.uniqueConcat(product.rp.defines);
+    defines = defines.uniqueConcat(product.rp.seriesDefines);
+    defines = defines.uniqueConcat(product.rp.targetDefines);
 
     var includePaths = [];
-    includePaths = includePaths.uniqueConcat(product.pico.includePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.seriesIncludePaths);
-    includePaths = includePaths.uniqueConcat(product.pico.targetIncludePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.includePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.seriesIncludePaths);
+    includePaths = includePaths.uniqueConcat(product.rp.targetIncludePaths);
 
     var args = flags;
     args = args.concat(defines.map(function(define) { return '-D' + define }));
@@ -113,7 +114,7 @@ function prepareCxxCompiler(project, product, inputs, outputs, input, output, ex
     args.push('-c', input.filePath);
     args.push('-o', output.filePath);
 
-    var cmd = new Command(product.pico.cxxCompilerPath, args);
+    var cmd = new Command(product.rp.cxxCompilerPath, args);
     cmd.description = 'compiling ' + input.fileName;
     cmd.highlight = 'compiler';
     cmd.jobPool = 'compiler';
@@ -122,14 +123,14 @@ function prepareCxxCompiler(project, product, inputs, outputs, input, output, ex
 
 function prepareArchiver(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
-    flags = flags.uniqueConcat(product.pico.archiverFlags);
-    flags = flags.uniqueConcat(product.pico.seriesArchiverFlags);
-    flags = flags.uniqueConcat(product.pico.targetArchiverFlags);
+    flags = flags.uniqueConcat(product.rp.archiverFlags);
+    flags = flags.uniqueConcat(product.rp.seriesArchiverFlags);
+    flags = flags.uniqueConcat(product.rp.targetArchiverFlags);
 
     var args = [flags.join(''), output.filePath];
     args = args.concat(inputs.obj.map(function(obj) { return obj.filePath }));
 
-    var cmd = new Command(product.pico.archiverPath, args);
+    var cmd = new Command(product.rp.archiverPath, args);
     cmd.description = 'archiving ' + output.fileName;
     cmd.highlight = 'linker';
     cmd.jobPool = 'linker';
@@ -138,19 +139,19 @@ function prepareArchiver(project, product, inputs, outputs, input, output, expli
 
 function prepareAppLinker(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
-    flags = flags.uniqueConcat(product.pico.linkerFlags);
-    flags = flags.uniqueConcat(product.pico.seriesLinkerFlags);
-    flags = flags.uniqueConcat(product.pico.targetLinkerFlags);
+    flags = flags.uniqueConcat(product.rp.linkerFlags);
+    flags = flags.uniqueConcat(product.rp.seriesLinkerFlags);
+    flags = flags.uniqueConcat(product.rp.targetLinkerFlags);
 
     var libraryPaths = [];
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.libraryPaths);
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.seriesLibraryPaths);
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.targetLibraryPaths);
+    libraryPaths = libraryPaths.uniqueConcat(product.rp.libraryPaths);
+    libraryPaths = libraryPaths.uniqueConcat(product.rp.seriesLibraryPaths);
+    libraryPaths = libraryPaths.uniqueConcat(product.rp.targetLibraryPaths);
 
     var libraries = [];
-    libraries = libraries.uniqueConcat(product.pico.libraries);
-    libraries = libraries.uniqueConcat(product.pico.seriesLibraries);
-    libraries = libraries.uniqueConcat(product.pico.targetLibraries);
+    libraries = libraries.uniqueConcat(product.rp.libraries);
+    libraries = libraries.uniqueConcat(product.rp.seriesLibraries);
+    libraries = libraries.uniqueConcat(product.rp.targetLibraries);
 
     var args = flags;
     args = args.concat(libraryPaths.map(function(path) { return '-L' + path }));
@@ -164,102 +165,19 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
     args.push('-Wl,-Map=' + outputs.map[0].filePath);
 
     var commands = [];
-    var cmd = new Command(product.pico.compilerPath, args); // use the compiler for the final linking
+    var cmd = new Command(product.rp.compilerPath, args); // use the compiler for the final linking
     cmd.description = 'linking ' + outputs.app[0].fileName;
     cmd.highlight = 'linker';
     cmd.jobPool = 'linker';
     commands.push(cmd);
 
-    args = ['-O', 'binary', outputs.app[0].filePath, outputs.bin[0].filePath];
-    var cmd = new Command(product.pico.objcopyPath, args); // generate the binary file
+    args = ['-O', 'binary', '--keep-section=.boot2', outputs.app[0].filePath, outputs.bin[0].filePath];
+    var cmd = new Command(product.rp.objcopyPath, args); // generate the binary file
     cmd.description = 'generating binary file for flashing ' + outputs.bin[0].fileName;
     cmd.highlight = 'linker';
     cmd.jobPool = 'linker';
     commands.push(cmd);
 
-    args = [/*'-Ax',*/ outputs.app[0].filePath];
-    var cmd = new Command(product.pico.sizePath, args); // show the size of the executable total
-    cmd.jobPool = 'linker';
-    cmd.silent = true;
-    commands.push(cmd);
-
-    var cmd = new JavaScriptCommand();
-    cmd.silent = true;
-    cmd.sourceCode = function() {
-        var p = new Process();
-        try {
-            args = ['--radix=x', outputs.app[0].filePath];
-            p.exec(product.pico.nmPath, args, true);
-            var lines = p.readStdOut().trim().split(/\r?\n/g);
-            var tags = ['__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack_start', '__stack_end' ], symbols = [];
-            lines.forEach(function(line) {
-                //console.info(line);
-                items = line.trim().split(' ');
-                if (tags.some(function(tag) { return items.contains(tag); })) {
-                    symbols.push({ name: items[2], value: parseInt(items[0], 16) });
-                }
-            });
-            //symbols.forEach(function(tag) {
-            //    console.info(tag.name + ' = ' + tag.value);
-            //});
-            console.info('Target device ' + product.pico.targetFamily + product.pico.targetType + product.pico.targetCore + product.pico.targetLine + product.pico.targetPins + product.pico.targetFlash);
-            console.info('  .text   (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__text_end'})[0].value - symbols.filter(function(item) { return item.name === '__text_start'})[0].value));
-            console.info('  .rodata (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__rodata_end'})[0].value - symbols.filter(function(item) { return item.name === '__rodata_start'})[0].value));
-            console.info('  .data   (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__data_end'})[0].value - symbols.filter(function(item) { return item.name === '__data_start'})[0].value));
-            console.info('  .bss    (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__bss_end'})[0].value - symbols.filter(function(item) { return item.name === '__bss_start'})[0].value));
-            console.info('  .heap   (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__heap_end'})[0].value - symbols.filter(function(item) { return item.name === '__heap_start'})[0].value));
-            console.info('  .stack  (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack_end'})[0].value - symbols.filter(function(item) { return item.name === '__stack_start'})[0].value));
-        } finally {
-            p.close();
-        }
-    };
-    commands.push(cmd);
-
-    return commands;
-}
-
-function prepareBootLinker(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
-    var flags = [];
-    flags = flags.uniqueConcat(product.pico.linkerFlags);
-    flags = flags.uniqueConcat(product.pico.seriesLinkerFlags);
-    flags = flags.uniqueConcat(product.pico.targetLinkerFlags);
-
-    var libraryPaths = [];
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.libraryPaths);
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.seriesLibraryPaths);
-    libraryPaths = libraryPaths.uniqueConcat(product.pico.targetLibraryPaths);
-
-    var libraries = [];
-    libraries = libraries.uniqueConcat(product.pico.libraries);
-    libraries = libraries.uniqueConcat(product.pico.seriesLibraries);
-    libraries = libraries.uniqueConcat(product.pico.targetLibraries);
-
-    var args = flags;
-    args = args.concat(libraryPaths.map(function(path) { return '-L' + path }));
-    args = args.concat('-L' + product.destinationDirectory);
-    args = args.concat(libraries.map(function(lib) { return '-l' + lib }));
-    args.push('-Wl,--start-group');
-    args = args.concat(inputs.lib.map(function(lib) { return '-l' + lib.baseName.substr(3, lib.baseName.length) }));
-    args.push('-Wl,--end-group');
-    args = args.concat(inputs.linkerscript.map(function(linkerscript) { return '-Wl,-T' + linkerscript.filePath }));
-    args.push('-o', outputs.boot[0].filePath);
-    args.push('-Wl,-Map=' + outputs.map[0].filePath);
-
-    var commands = [];
-    var cmd = new Command(product.pico.compilerPath, args); // use the compiler for the final linking
-    cmd.description = 'linking ' + outputs.boot[0].fileName;
-    cmd.highlight = 'linker';
-    cmd.jobPool = 'linker';
-    commands.push(cmd);
-
-    args = ['-O', 'binary', outputs.boot[0].filePath, outputs.bin[0].filePath];
-    var cmd = new Command(product.pico.objcopyPath, args); // generate the binary file
-    cmd.description = 'generating binary file for flashing ' + outputs.bin[0].fileName;
-    cmd.highlight = 'linker';
-    cmd.jobPool = 'linker';
-    commands.push(cmd);
-
-    args = ['-O', 'binary', outputs.boot[0].filePath, outputs.bin[0].filePath];
     var cmd = new JavaScriptCommand();
     cmd.description = 'patching binary file for flashing ' + outputs.bin[0].fileName;
     cmd.input = outputs.bin[0].filePath;
@@ -270,17 +188,19 @@ function prepareBootLinker(project, product, inputs, outputs, input, output, exp
         var data = infile.read(252);
         infile.close();
 
+        var crc = Checksum.crc32(data);
+
         /* write back to the file */
         var outfile = BinaryFile(output, BinaryFile.ReadWrite);
         outfile.seek(252);
-        outfile.write(Checksum.crc32(data));
+        outfile.write(crc);
         outfile.close();
     };
     cmd.jobPool = 'linker';
     commands.push(cmd);
 
-    args = [/*'-Ax',*/ outputs.boot[0].filePath];
-    var cmd = new Command(product.pico.sizePath, args); // show the size of the executable total
+    args = [/*'-Ax',*/ outputs.app[0].filePath];
+    var cmd = new Command(product.rp.sizePath, args); // show the size of the executable total
     cmd.jobPool = 'linker';
     cmd.silent = true;
     commands.push(cmd);
@@ -290,20 +210,25 @@ function prepareBootLinker(project, product, inputs, outputs, input, output, exp
     cmd.sourceCode = function() {
         var p = new Process();
         try {
-            args = ['--radix=x', outputs.boot[0].filePath];
-            p.exec(product.pico.nmPath, args, true);
+            args = ['--radix=x', outputs.app[0].filePath];
+            p.exec(product.rp.nmPath, args, true);
             var lines = p.readStdOut().trim().split(/\r?\n/g);
-            var tags = ['__text_start', '__text_end', '__data_start', '__data_end'], symbols = [];
+            var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack_start', '__stack_end' ], symbols = [];
             lines.forEach(function(line) {
+                //console.info(line);
                 items = line.trim().split(' ');
                 if (tags.some(function(tag) { return items.contains(tag); })) {
                     symbols.push({ name: items[2], value: parseInt(items[0], 16) });
                 }
             });
-
-            console.info('Target device ' + product.pico.targetFamily + product.pico.targetCoreCount + product.pico.targetCoreType + product.pico.targetRam + product.pico.targetFlash + '-' + product.pico.targetSerialFlash);
-            console.info('  .text   (BOOT2)   =  ' + (symbols.filter(function(item) { return item.name === '__text_end'})[0].value - symbols.filter(function(item) { return item.name === '__text_start'})[0].value));
-            console.info('  .data   (CRC)     =  ' + (symbols.filter(function(item) { return item.name === '__data_end'})[0].value - symbols.filter(function(item) { return item.name === '__data_start'})[0].value));
+            console.info('Target device ' + product.rp.targetFamily + product.rp.targetCoreCount + product.rp.targetCoreType + product.rp.targetRam + product.rp.targetFlash + '-' + product.rp.targetSerialFlash);
+            console.info('  .boot2  (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__boot2_end'})[0].value - symbols.filter(function(item) { return item.name === '__boot2_start'})[0].value));
+            console.info('  .text   (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__text_end'})[0].value - symbols.filter(function(item) { return item.name === '__text_start'})[0].value));
+            console.info('  .rodata (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__rodata_end'})[0].value - symbols.filter(function(item) { return item.name === '__rodata_start'})[0].value));
+            console.info('  .data   (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__data_end'})[0].value - symbols.filter(function(item) { return item.name === '__data_start'})[0].value));
+            console.info('  .bss    (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__bss_end'})[0].value - symbols.filter(function(item) { return item.name === '__bss_start'})[0].value));
+            console.info('  .heap   (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__heap_end'})[0].value - symbols.filter(function(item) { return item.name === '__heap_start'})[0].value));
+            console.info('  .stack  (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack_end'})[0].value - symbols.filter(function(item) { return item.name === '__stack_start'})[0].value));
         } finally {
             p.close();
         }

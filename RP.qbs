@@ -143,7 +143,7 @@ Module {
     property stringList linkerFlags: [
         //'-specs=nosys.specs',
         //'-specs=nano.specs',
-        '--specs=nosys.specs',
+        '-specs=nosys.specs',
         //'-masm-syntax-unified',
         //'-nostartfiles',
         '-ffreestanding',

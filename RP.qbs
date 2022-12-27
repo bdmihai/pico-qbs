@@ -75,17 +75,8 @@ Module {
     property pathList targetIncludePaths
 
     property stringList asmFlags: [
-        //'-specs=nosys.specs',
-        //'-specs=nano.specs',
-        //'-masm-syntax-unified',
-        //'-ffreestanding',
-        //'-fno-exceptions',
-        //'-fno-unwind-tables',
         '-ffunction-sections',
         '-fdata-sections',
-        //'-fstack-usage',
-        //'-Wall',
-        //'-Wextra',
         '-Og',
         '-ggdb'
     ]
@@ -94,15 +85,10 @@ Module {
 
     property stringList cFlags: [
         '-std=gnu11',
-        //'-specs=nosys.specs',
-        //'-specs=nano.specs',
         '-masm-syntax-unified',
-        //'-ffreestanding',
-        //'-fno-exceptions',
-        //'-fno-unwind-tables',
         '-ffunction-sections',
         '-fdata-sections',
-        //'-fstack-usage',
+        '-fstack-usage',
         '-Wall',
         '-Wextra',
         '-Og',
@@ -113,13 +99,10 @@ Module {
 
     property stringList cxxFlags: [
         '-std=gnu++17',
-        //'-specs=nosys.specs',
-        //'-specs=nano.specs',
         '-masm-syntax-unified',
-        //'-ffreestanding',
         '-ffunction-sections',
         '-fdata-sections',
-        //'-fstack-usage',
+        '-fstack-usage',
         '-fno-unwind-tables',
         '-fno-exceptions',
         '-fno-rtti',
@@ -144,20 +127,20 @@ Module {
         //'-specs=nosys.specs',
         //'-specs=nano.specs',
         '-specs=nosys.specs',
-        //'-masm-syntax-unified',
-        //'-nostartfiles',
         '-ffreestanding',
-        '-fno-exceptions',
-        '-fno-unwind-tables',
-        '-ffunction-sections',
-        '-fdata-sections',
-        '-fstack-usage',
-        '-Wall',
-        '-Wextra',
-        '-Wl,--no-warn-rwx-segments', // disable the warning about rwx segments 
-        //'-nostartfiles',
+        '-nostartfiles',
         //'-nodefaultlibs',
         '-nolibc',
+        //'-nostdlib',
+        //'-fno-exceptions',
+        //'-fno-unwind-tables',
+        //'-ffunction-sections',
+        //'-fdata-sections',
+        //'-fstack-usage',
+        //'-Wall',
+        //'-Wextra',
+        '-Wl,--no-warn-rwx-segments', // disable the warning about rwx segments 
+        '-Wl,--gc-sections',
         '-Og',
         '-ggdb'
     ]

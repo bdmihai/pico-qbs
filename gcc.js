@@ -28,6 +28,7 @@
 var BinaryFile = require('qbs.BinaryFile');
 var Process    = require('qbs.Process');
 var Checksum   = require('crc32.js');
+var Bin2UF2    = require('bin2uf2.js');
 
 function prepareAssembler(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
@@ -195,6 +196,33 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
         outfile.seek(252);
         outfile.write(crc);
         outfile.close();
+    };
+    cmd.jobPool = 'linker';
+    commands.push(cmd);
+
+    var cmd = new JavaScriptCommand();
+    cmd.description = 'creating UF2 file from binary file for flashing ' + outputs.uf2[0].fileName;
+    cmd.input = outputs.bin[0].filePath;
+    cmd.output = outputs.uf2[0].filePath;
+    cmd.sourceCode = function() {
+        var infile = BinaryFile(input, BinaryFile.ReadOnly);
+        var outfile = BinaryFile(output, BinaryFile.WriteOnly);
+        var target_address = 0x10000000;
+        var num_blocks = Math.floor(infile.size() / 256) + ((infile.size() % 256) ? 1 : 0);
+
+        for (var block_no = 0; block_no < num_blocks; block_no++, target_address += 256) {
+            /* read the binary containing the program */
+            var data = infile.read(256);
+
+            /* build a standard rp2040 uf2 block */
+            var block = Bin2UF2.create_uf2_block(data, target_address, block_no, num_blocks);
+
+            /* write back to the uf2 file */
+            outfile.write(block);
+        }
+        
+        infile.close();
+        outfile.close();        
     };
     cmd.jobPool = 'linker';
     commands.push(cmd);

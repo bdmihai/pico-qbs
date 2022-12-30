@@ -249,7 +249,7 @@ Module {
         multiplex: true
         inputs: ['lib', 'linkerscript']
         inputsFromDependencies: ['lib', 'linkerscript']
-        outputFileTags: ['app', 'map', 'bin']
+        outputFileTags: ['app', 'map', 'bin', 'uf2']
         outputArtifacts: {
             var artifacts = [
                 {
@@ -263,6 +263,10 @@ Module {
                 {
                     filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.bin'),
                     fileTags: ['bin']
+                },
+                {
+                    filePath: FileInfo.joinPaths(product.destinationDirectory, product.targetName + '.uf2'),
+                    fileTags: ['uf2']
                 }
             ];
             return artifacts;

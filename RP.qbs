@@ -125,20 +125,11 @@ Module {
     property stringList targetArchiverFlags
 
     property stringList linkerFlags: [
-        //'-specs=nosys.specs',
-        //'-specs=nano.specs',
         '-specs=nosys.specs',
         '-nostartfiles',
-        //'-nodefaultlibs',
-        //'-nolibc',
-        //'-nostdlib',
-        //'-fno-exceptions',
-        //'-fno-unwind-tables',
-        //'-ffunction-sections',
-        //'-fdata-sections',
-        //'-fstack-usage',
-        //'-Wall',
-        //'-Wextra',
+        '-nodefaultlibs',
+        '-nolibc',
+        '-nostdlib',
         '-Wl,--no-warn-rwx-segments', // disable the warning about rwx segments 
         '-Wl,--gc-sections',
         '-Og',

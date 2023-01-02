@@ -241,7 +241,7 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
             args = ['--radix=x', outputs.app[0].filePath];
             p.exec(product.rp.nmPath, args, true);
             var lines = p.readStdOut().trim().split(/\r?\n/g);
-            var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack_start', '__stack_end' ], symbols = [];
+            var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack0_bottom', '__stack0_top', '__stack1_bottom', '__stack1_top' ], symbols = [];
             lines.forEach(function(line) {
                 //console.info(line);
                 items = line.trim().split(' ');
@@ -256,7 +256,8 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
             console.info('  .data   (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__data_end'})[0].value - symbols.filter(function(item) { return item.name === '__data_start'})[0].value));
             console.info('  .bss    (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__bss_end'})[0].value - symbols.filter(function(item) { return item.name === '__bss_start'})[0].value));
             console.info('  .heap   (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__heap_end'})[0].value - symbols.filter(function(item) { return item.name === '__heap_start'})[0].value));
-            console.info('  .stack  (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack_end'})[0].value - symbols.filter(function(item) { return item.name === '__stack_start'})[0].value));
+            console.info('  .stack0 (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack0_top'})[0].value - symbols.filter(function(item) { return item.name === '__stack0_bottom'})[0].value));
+            console.info('  .stack1 (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack1_top'})[0].value - symbols.filter(function(item) { return item.name === '__stack1_bottom'})[0].value));
         } finally {
             p.close();
         }

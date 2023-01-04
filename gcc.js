@@ -42,11 +42,10 @@ function prepareAssembler(project, product, inputs, outputs, input, output, expl
     defines = defines.uniqueConcat(product.rp.targetDefines);
 
     var includePaths = [];
-    
     includePaths = includePaths.uniqueConcat(product.rp.includePaths);
     includePaths = includePaths.uniqueConcat(product.rp.seriesIncludePaths);
     includePaths = includePaths.uniqueConcat(product.rp.targetIncludePaths);
-    console.info(includePaths);
+
     var args = flags;
     args.push('-x', 'assembler-with-cpp');
     args = args.concat(defines.map(function(define) { return '-D' + define }));
@@ -61,7 +60,6 @@ function prepareAssembler(project, product, inputs, outputs, input, output, expl
     cmd.jobPool = 'compiler';
     return cmd;
 }
-
 
 function prepareCompiler(project, product, inputs, outputs, input, output, explicitlyDependsOn) {
     var flags = [];
@@ -243,7 +241,6 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
             var lines = p.readStdOut().trim().split(/\r?\n/g);
             var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack0_bottom', '__stack0_top', '__stack1_bottom', '__stack1_top' ], symbols = [];
             lines.forEach(function(line) {
-                //console.info(line);
                 items = line.trim().split(' ');
                 if (tags.some(function(tag) { return items.contains(tag); })) {
                     symbols.push({ name: items[2], value: parseInt(items[0], 16) });

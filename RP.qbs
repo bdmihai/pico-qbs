@@ -1,6 +1,6 @@
 /*_____________________________________________________________________________
  │                                                                            |
- │ COPYRIGHT (C) 2022 Mihai Baneu                                             |
+ │ COPYRIGHT (C) 2023 Mihai Baneu                                             |
  │                                                                            |
  | Permission is hereby  granted,  free of charge,  to any person obtaining a |
  | copy of this software and associated documentation files (the "Software"), |
@@ -21,7 +21,7 @@
  | THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                 |
  |____________________________________________________________________________|
  |                                                                            |
- |  Author: Mihai Baneu                           Last modified: 16.Dec.2022  |
+ |  Author: Mihai Baneu                           Last modified: 28.Jan.2023  |
  |                                                                            |
  |___________________________________________________________________________*/
  
@@ -29,7 +29,10 @@ import qbs.File
 import qbs.FileInfo
 import qbs.TextFile
 import qbs.Utilities
+import qbs.Probes
+import qbs.ModUtils
 import 'gcc.js' as Gcc
+import 'pio.js' as Pio
 
 Module {
     condition: false
@@ -58,6 +61,12 @@ Module {
     property string sizePath:             toolchainPath + sizeName
     property string nmPath:               toolchainPath + nmName
 
+    Probes.PathProbe {
+        id: pioasmProbe
+        names: 'pioasm'
+        searchPaths: [ FileInfo.cleanPath(project.sourceDirectory + '/../tools/pioasm/bin') ]
+    }
+    property string pioasmPath: pioasmProbe.found ? pioasmProbe.filePath : 'pioasm'
 
     property string targetFamily: 'RP'    // e.g.   - RP
     property string targetCoreCount       // e.g.   - 2   dual core
@@ -70,9 +79,13 @@ Module {
     property stringList seriesDefines
     property stringList targetDefines
 
-    property pathList includePaths
+    property pathList includePaths: [ buildDirectory + '/codegen/pioasm' ]
     property pathList seriesIncludePaths
     property pathList targetIncludePaths
+
+    property stringList pioFlags
+    property stringList seriesPioFlags
+    property stringList targetPioFlags
 
     property stringList asmFlags: [
         '-ffunction-sections',
@@ -147,6 +160,11 @@ Module {
     property stringList targetLibraries
 
     FileTagger {
+        patterns: [ '*.pio' ]
+        fileTags: ['pio']
+    }
+
+    FileTagger {
         patterns: [ '*.s', '*.S' ]
         fileTags: ['asm']
     }
@@ -174,6 +192,20 @@ Module {
     FileTagger {
         patterns: ['*.ld']
         fileTags: ['linkerscript']
+    }
+
+    Rule {
+        name: 'pioasm'
+        inputs: ['pio']
+
+        Artifact {
+            fileTags: ['hpp']
+            filePath: FileInfo.joinPaths(product.buildDirectory, 'codegen/pioasm', FileInfo.relativePath(product.sourceDirectory, input.filePath) + '.h')
+        }
+
+        prepare: {
+            return Pio.prepareGenerator.apply(Pio, arguments);
+        }
     }
 
     Rule {
@@ -310,6 +342,14 @@ Module {
             }
             linkerScript.close();
             return retval;
+        }
+    }
+
+    validate: {
+        if (!pioasmProbe.found) {
+            throw ModUtils.ModuleError(
+                    'Could not find pioasm binary at any of the following locations:\n\t' +
+                    pioasmProbe.candidatePaths.join('\n\t'));
         }
     }
 }

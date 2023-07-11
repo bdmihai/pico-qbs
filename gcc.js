@@ -242,7 +242,7 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
             var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack0_bottom', '__stack0_top', '__stack1_bottom', '__stack1_top' ], symbols = [];
             lines.forEach(function(line) {
                 items = line.trim().split(' ');
-                if (tags.some(function(tag) { return items.contains(tag); })) {
+                if (tags.some(function(tag) { return items.includes(tag); })) {
                     symbols.push({ name: items[2], value: parseInt(items[0], 16) });
                 }
             });

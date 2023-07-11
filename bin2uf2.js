@@ -56,7 +56,7 @@ function create_uf2_block(data, target_address, block_no, num_blocks)
     push_32bit(block, RP2040_FAMILY_ID);
 
     for (var i = 0; i < data.length; i++) {
-        block.push(data[i]);
+        block.push(data[i] & 0xFF);
     }
 
     for (var i = 0; i < 476 - data.length; i++) {

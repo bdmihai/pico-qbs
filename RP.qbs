@@ -79,7 +79,7 @@ Module {
     property stringList seriesDefines
     property stringList targetDefines
 
-    property pathList includePaths: [ buildDirectory + '/codegen/pioasm' ]
+    property pathList includePaths: [ product.buildDirectory + '/codegen/pioasm' ]
     property pathList seriesIncludePaths
     property pathList targetIncludePaths
 

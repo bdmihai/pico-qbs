@@ -29,4 +29,5 @@ RP2040 {
     condition: qbs.targetPlatform === "RP2040-W25Q64JV"
 
     targetSerialFlash: 'W25Q64JV'
+    sizeofFlash:        8*1024*1024
 }

@@ -74,6 +74,9 @@ Module {
     property string targetRam             // e.g.   - 4   floor(log2(ram / 16k)))
     property string targetFlash           // e.g.   - 0   floor(log2(nonvolatile / 16k))
     property string targetSerialFlash     // e.g.   - W25Q64JV (winbond 64 Mbit Quad SPI data flash)
+    
+    property int sizeofFlash: 0
+    property int sizeofRam: 0
 
     property stringList defines
     property stringList seriesDefines

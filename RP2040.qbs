@@ -33,6 +33,8 @@ RP {
     targetRam:        '4'     // floor(log2(256k / 16k))
     targetFlash:      '0'     // floor(log2(0 / 16k))
 
+    sizeofRam:        264*1024
+
     seriesAsmFlags: [
         '-mcpu=cortex-m0plus',
         '-mlittle-endian',

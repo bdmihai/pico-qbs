@@ -234,27 +234,55 @@ function prepareAppLinker(project, product, inputs, outputs, input, output, expl
     var cmd = new JavaScriptCommand();
     cmd.silent = true;
     cmd.sourceCode = function() {
-        var p = new Process();
+        const p = new Process();
         try {
-            args = ['--radix=x', outputs.app[0].filePath];
-            p.exec(product.rp.nmPath, args, true);
-            var lines = p.readStdOut().trim().split(/\r?\n/g);
-            var tags = ['__boot2_start', '__boot2_end', '__data_start', '__data_end', '__text_start', '__text_end', '__rodata_start', '__rodata_end', '__bss_start', '__bss_end', '__heap_start', '__heap_end', '__stack0_bottom', '__stack0_top', '__stack1_bottom', '__stack1_top' ], symbols = [];
+            args = ['--format=sysv', '--radix=10', outputs.app[0].filePath];
+            p.exec(product.rp.sizePath, args, true);
+            const lines = p.readStdOut().trim().split(/\r?\n/g);
+            const sectionList  = [ 
+                { name: '.boot2',      type: 'FLASH,RAM'},
+                { name: '.text',       type: 'FLASH'},
+                { name: '.rodata',     type: 'FLASH' },
+                { name: '.data',       type: 'FLASH,RAM'},
+                { name: '.bss',        type: 'RAM,0'},
+                { name: '.heap',       type: 'RAM'},
+                { name: '.stack0',     type: 'RAM'},
+                { name: '.stack1',     type: 'RAM'}
+            ];
+            var ramSize = 0; flashSize = 0;
+            
+            console.info(outputs.app[0].filePath);
             lines.forEach(function(line) {
-                items = line.trim().split(' ');
-                if (tags.some(function(tag) { return items.includes(tag); })) {
-                    symbols.push({ name: items[2], value: parseInt(items[0], 16) });
-                }
+                items = line.trim().split(' ').filter(function(i) {return i} );
+
+                sectionList.forEach(function(section) {
+                    if (section.name === items[0]) {
+                        section.size = items[1]
+                        section.start = parseInt(items[2], 10).toString(16);
+                        section.end = (parseInt(items[2], 10) + parseInt(items[1], 10)).toString(16);
+
+                        console.info(
+                            '   ' + section.name + 
+                            ' '.repeat(18 - section.name.length) + '(' + section.type + ')' + 
+                            ' '.repeat(10 - section.type.length) + '= ' + 
+                            ' '.repeat(8 - section.size.length) + section.size + 
+                            ' '.repeat(6) + '0x' + '0'.repeat(8 - section.start.length) + section.start + ' - ' + '0x' + '0'.repeat(8 - section.end.length) + section.end);
+
+                        if (section.type.contains('FLASH')) {
+                            flashSize += parseInt(section.size, 10);
+                        }
+                        if (section.type.contains('RAM')) {
+                            ramSize += parseInt(section.size, 10);
+                        }
+                    }
+                });
             });
-            console.info('Target device ' + product.rp.targetFamily + product.rp.targetCoreCount + product.rp.targetCoreType + product.rp.targetRam + product.rp.targetFlash + '-' + product.rp.targetSerialFlash);
-            console.info('  .boot2  (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__boot2_end'})[0].value - symbols.filter(function(item) { return item.name === '__boot2_start'})[0].value));
-            console.info('  .text   (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__text_end'})[0].value - symbols.filter(function(item) { return item.name === '__text_start'})[0].value));
-            console.info('  .rodata (FLASH)         =  ' + (symbols.filter(function(item) { return item.name === '__rodata_end'})[0].value - symbols.filter(function(item) { return item.name === '__rodata_start'})[0].value));
-            console.info('  .data   (RAM,FLASH)     =  ' + (symbols.filter(function(item) { return item.name === '__data_end'})[0].value - symbols.filter(function(item) { return item.name === '__data_start'})[0].value));
-            console.info('  .bss    (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__bss_end'})[0].value - symbols.filter(function(item) { return item.name === '__bss_start'})[0].value));
-            console.info('  .heap   (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__heap_end'})[0].value - symbols.filter(function(item) { return item.name === '__heap_start'})[0].value));
-            console.info('  .stack0 (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack0_top'})[0].value - symbols.filter(function(item) { return item.name === '__stack0_bottom'})[0].value));
-            console.info('  .stack1 (RAM)           =  ' + (symbols.filter(function(item) { return item.name === '__stack1_top'})[0].value - symbols.filter(function(item) { return item.name === '__stack1_bottom'})[0].value));
+
+            console.info('Total used by ' + 
+                product.rp.targetFamily + product.rp.targetCoreCount + product.rp.targetCoreType + product.rp.targetRam + product.rp.targetFlash + '-' + product.rp.targetSerialFlash + 
+                ' (' + product.rp.sizeofFlash/(1024*1024) + 'MB, ' + product.rp.sizeofRam/1024 + 'kB): ' +
+                flashSize + ' (' + Math.ceil(flashSize/product.rp.sizeofFlash * 100) + '% FLASH) and ' + 
+                ramSize + ' (' + Math.ceil(ramSize/product.rp.sizeofRam * 100) + '% RAM) ');
         } finally {
             p.close();
         }
